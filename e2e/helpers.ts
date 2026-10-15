@@ -40,6 +40,8 @@ export async function tap(id: string) {
 
 export async function type(id: string, text: string) {
   await element(by.id(id)).replaceText(text);
+  // Without a hardware keyboard (CI simulators) the software keyboard covers the buttons.
+  await element(by.id(id)).tapReturnKey();
 }
 
 export async function clearLogs() {

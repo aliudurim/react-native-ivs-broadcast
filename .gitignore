@@ -84,3 +84,12 @@ android/generated
 
 # React Native Nitro Modules
 nitrogen/
+
+# Amazon IVS SDK, downloaded by scripts/fetch-ios-sdk.sh during pod install
+ios/Frameworks/
+
+# Detox
+artifacts/
+
+# Jest coverage
+coverage/

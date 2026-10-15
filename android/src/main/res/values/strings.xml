@@ -1,0 +1,5 @@
+<resources>
+  <!-- Override either string in your app's res/values/strings.xml to localize the foreground-service notification. -->
+  <string name="ivs_broadcast_notification_channel">Live broadcast</string>
+  <string name="ivs_broadcast_notification_text">You\'re live</string>
+</resources>

@@ -1,4 +1,12 @@
 {
   "extends": "./tsconfig",
-  "exclude": ["example", "lib"]
+  "compilerOptions": {
+    "types": []
+  },
+  "exclude": [
+    "example",
+    "lib",
+    "e2e",
+    "src/__tests__"
+  ]
 }

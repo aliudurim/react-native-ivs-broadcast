@@ -1,16 +1,8 @@
+import groovy.json.JsonSlurper
+
 buildscript {
-  ext.IvsBroadcast = [
-    kotlinVersion: "2.0.21",
-    minSdkVersion: 24,
-    compileSdkVersion: 36
-  ]
-
-  ext.getExtOrDefault = { prop ->
-    if (rootProject.ext.has(prop)) {
-      return rootProject.ext.get(prop)
-    }
-
-    return IvsBroadcast[prop]
+  ext.getExtOrDefault = { name ->
+    return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties["IvsBroadcast_" + name]
   }
 
   repositories {
@@ -25,31 +17,50 @@ buildscript {
   }
 }
 
-
 apply plugin: "com.android.library"
 
 if (project.extensions.findByName("kotlin") == null) {
   apply plugin: "kotlin-android"
 }
 
-
 apply plugin: "com.facebook.react"
+
+def getExtOrIntegerDefault(name) {
+  return getExtOrDefault(name).toString().toInteger()
+}
+
+def pkg = new JsonSlurper().parseText(file("../package.json").text)
+// Apps can pin a different SDK build with `ivsBroadcastSdkVersion` in the root project's ext.
+def ivsSdkVersion = rootProject.ext.has("ivsBroadcastSdkVersion")
+  ? rootProject.ext.get("ivsBroadcastSdkVersion")
+  : pkg.ivsSdk.android
 
 android {
   namespace "com.ivsbroadcast"
 
-  compileSdkVersion getExtOrDefault("compileSdkVersion")
+  compileSdkVersion getExtOrIntegerDefault("compileSdkVersion")
 
   defaultConfig {
-    minSdkVersion getExtOrDefault("minSdkVersion")
+    minSdkVersion getExtOrIntegerDefault("minSdkVersion")
+    targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
   }
 
   compileOptions {
     sourceCompatibility JavaVersion.VERSION_17
     targetCompatibility JavaVersion.VERSION_17
   }
+
+  lintOptions {
+    disable "GradleCompatible"
+  }
+}
+
+repositories {
+  google()
+  mavenCentral()
 }
 
 dependencies {
   implementation "com.facebook.react:react-android"
+  api "com.amazonaws:ivs-broadcast:${ivsSdkVersion}:stages@aar"
 }

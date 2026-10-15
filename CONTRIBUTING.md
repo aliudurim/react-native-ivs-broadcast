@@ -77,17 +77,66 @@ yarn lint --fix
 
 
 
+### Example app
+
+The example has a **Broadcast** screen and a **Stage** screen. Each exposes every prop and method as a control and writes every event to an on-screen log. The e2e tests drive the app through that log.
+
+- **Broadcast**: paste a channel's ingest endpoint (`rtmps://…:443/app/`) and stream key, then tap *Start*.
+- **Stage**: tap *Prepare*, paste a participant token from `aws ivs-realtime create-participant-token --stage-arn <arn>`, then tap *Join*. Join from a second device or the [IVS web sample](https://codepen.io/amazon-ivs/project/editor/ZzWobn) to see remote video.
+
+Simulators have no camera, so *Prepare* rejects there and the broadcast preview stays black. Use a real device to see video.
+
+The first `pod install` downloads the Amazon IVS SDK into `ios/Frameworks` (git-ignored). Delete that folder to force a fresh download.
+
+### Unit tests
+
+```sh
+yarn test
+```
+
+Jest tests live in `src/__tests__`. They cover the JS layer: prop mapping, event reshaping, the stage reducer and store, the native-module bridge (with a mocked TurboModule) and the hook.
+
+### End-to-end tests
+
+[Detox](https://wix.github.io/Detox/) suites in [`e2e/`](./e2e) run against the example app in **release** mode, so no Metro is needed:
+
+```sh
+# iOS: requires applesimutils:
+#   brew tap wix/brew && brew trust wix/brew && brew install applesimutils
+yarn e2e:build:ios:release && yarn e2e:test:ios:release
+
+# Android: boots the AVD named in DETOX_AVD_NAME (default Pixel_8_Pro)
+yarn e2e:build:android:release && yarn e2e:test:android:release
+```
+
+Set `DETOX_IOS_DEVICE` / `DETOX_AVD_NAME` to pick a different simulator or emulator. The debug configurations (`yarn e2e:build:ios`, `yarn e2e:test:ios`, …) use Metro instead.
+
 ### Scripts
 
-The `package.json` file contains various scripts for common tasks:
+- `yarn`: install dependencies for the library and the example.
+- `yarn typecheck`: type-check with TypeScript.
+- `yarn lint`: lint with ESLint and Prettier (`yarn lint --fix` to fix).
+- `yarn test`: run the unit tests.
+- `yarn prepare`: build `lib/` with react-native-builder-bob.
+- `yarn pods`: install the example's CocoaPods.
+- `yarn example start | ios | android`: run the example app.
+- `yarn e2e:*`: build and run the Detox suites (see above).
+- `yarn release`: cut a release (see below).
 
-- `yarn`: setup project by installing dependencies.
-- `yarn typecheck`: type-check files with TypeScript.
-  - `yarn lint`: lint files with [ESLint](https://eslint.org/).
-    - `yarn example start`: start the Metro server for the example app.
-- `yarn example android`: run the example app on Android.
-- `yarn example ios`: run the example app on iOS.
-  
+### Commit messages
+
+We follow [Conventional Commits](https://www.conventionalcommits.org/): `fix:`, `feat:`, `refactor:`, `docs:`, `test:`, `chore:`. [lefthook](https://github.com/evilmartians/lefthook) runs commitlint on each commit message, and ESLint plus TypeScript on staged files.
+
+### Publishing to npm
+
+[release-it](https://github.com/release-it/release-it) bumps the version, updates `CHANGELOG.md`, tags `vX.Y.Z`, publishes to npm and creates the GitHub release:
+
+```sh
+yarn release
+```
+
+Pushing a `vX.Y.Z` tag also triggers the [publish workflow](.github/workflows/publish.yml), which publishes with npm provenance. Use one route or the other.
+
 ### Sending a pull request
 
 > **Working on your first pull request?** You can learn how from this _free_ series: [How to Contribute to an Open Source Project on GitHub](https://app.egghead.io/playlists/how-to-contribute-to-an-open-source-project-on-github).

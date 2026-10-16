@@ -2,7 +2,7 @@
 
 All notable changes to this project are documented here. This project follows [Semantic Versioning](https://semver.org/) and [Conventional Commits](https://www.conventionalcommits.org/).
 
-## 0.1.0 (unreleased)
+## 0.1.0 (2026-10-16)
 
 ### Features
 
